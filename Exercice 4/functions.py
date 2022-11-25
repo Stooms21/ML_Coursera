@@ -104,9 +104,8 @@ def predict(Theta1, Theta2, X):
     return p
 
 
-def randInitializeWeights(L_in, L_out):
-    W = 0
-    return W
+def randInitializeWeights(L_in, L_out, epsilon):
+    return np.random.rand(L_out, 1 + L_in) * 2 * epsilon - epsilon
 
 
 def checkNNGradients(lambda_t=0):
