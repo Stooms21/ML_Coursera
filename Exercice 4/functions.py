@@ -112,7 +112,6 @@ def nnGradCostFunction(nn_params,
     X = np.concatenate((np.ones((m, 1)), X), axis=1)
 
     # Compute first hidden unit and adding the bias
-    z2 = sigmoid(X @ Theta1.T)
     a2 = np.concatenate((np.ones((m, 1)), sigmoid(X @ Theta1.T)), axis=1)
 
     # Compute h_theta
@@ -164,12 +163,10 @@ def checkNNGradients(lambda_t=0):
     # Unroll parameters
     nn_params = np.concatenate((Theta1.T.ravel(), Theta2.T.ravel()))
 
-    # Short hand for cost function
-    cost = nnCostFunction(nn_params, input_layer_size, hidden_layer_size,
-                          num_labels, X, y, lambda_t)
     grad = nnGradCostFunction(nn_params, input_layer_size, hidden_layer_size,
                               num_labels, X, y, lambda_t)
 
+    # Short hand for cost function
     costFunc = lambda p: nnCostFunction(p, input_layer_size, hidden_layer_size,
                                         num_labels, X, y, lambda_t)
 
@@ -232,7 +229,7 @@ def debugInitializeWeights(fan_out, fan_in):
     #   the first row of W handles the "bias" terms
     #
 
-# Set W to zeros
+    # Set W to zeros
     W = np.zeros((fan_out, 1 + fan_in))
 
     # Initialize W using "sin", this ensures that W is always of the same
