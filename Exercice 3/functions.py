@@ -53,8 +53,6 @@ def displayData(X, example_width=np.array([])):
         if currEx > m:
             break
 
-    display_array = display_array
-
     # Display Image
     h = plt.imshow(display_array, vmin=-1, vmax=1, cmap=color)
 

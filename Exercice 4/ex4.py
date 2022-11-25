@@ -37,13 +37,13 @@ print('Loading and Visualizing Data ...\n')
 
 data = loadmat('../Data/ex4data1.mat')
 X = data['X']
-y = data['y']
+y = data['y'].reshape((np.size(data['y']),))
 
 m = np.size(X, 0)
 
 # Randomly select 100 data points to display
 sel = np.random.permutation(m)
-sel = sel[1:100]
+sel = sel[0:100]
 
 f.displayData(X[sel, :])
 

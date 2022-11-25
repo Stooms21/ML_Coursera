@@ -23,14 +23,27 @@ def nnCostFunction(nn_params,
     # Reshape nn_params back into the parameters Theta1 and Theta2, the weight matrices
     # for our 2 layer neural network
 
-    Theta1 = np.reshape(nn_params[1:hidden_layer_size * (input_layer_size + 1)],
+    Theta1 = np.reshape(nn_params[0:hidden_layer_size * (input_layer_size + 1)],
                         (hidden_layer_size, (input_layer_size + 1)), order='F')
 
-    Theta2 = np.reshape(nn_params[(1 + (hidden_layer_size * (input_layer_size + 1))):],
+    Theta2 = np.reshape(nn_params[(hidden_layer_size * (input_layer_size + 1))::],
                         (num_labels, (hidden_layer_size + 1)), order='F')
 
     # Setup some useful variables
     m = np.size(X, 0)
+
+    # recode the y labels to get vectors of 0 and 1
+    eye = np.eye(num_labels)
+    yr = eye[y - 1]
+
+    # Add the column of ones for bias unit
+    X = np.concatenate((np.ones((m, 1)), X), axis=1)
+
+    # Compute first hidden unit and adding the bias
+    a2 = np.concatenate((np.ones((m, 1)), sigmoid(X @ Theta1.T)), axis=1)
+
+    # Compute h_theta
+    h_theta = sigmoid(a2 @ Theta2.T)
 
     # You need to return the following variables correctly
     # ====================== YOUR CODE HERE ======================
@@ -73,8 +86,8 @@ def nnCostFunction(nn_params,
     # =========================================================================
 
     # Unroll gradients
+    J = 1 / m * np.sum(-yr * np.log(h_theta) - (1 - yr) * np.log(1 - h_theta))
 
-    J = 0
     return J
 
 
@@ -150,16 +163,14 @@ def displayData(X, example_width=np.array([])):
 
             # Get the max value of the patch
             max_val = np.max(np.abs(X[currEx, :]))
-            startj, j = pad + j * (example_height + pad) + (0, example_width)
-            starti, i = pad + i * (example_height + pad) + (0, example_height)
-            display_array[startj:j, starti:i] = \
+            startj, endj = pad + j * (example_height + pad) + (0, example_width)
+            starti, endi = pad + i * (example_height + pad) + (0, example_height)
+            display_array[startj:endj, starti:endi] = \
                 np.reshape(X[currEx, :], (example_height, example_width), order='F') / max_val
             currEx = currEx + 1
 
         if currEx > m:
             break
-
-    display_array = display_array
 
     # Display Image
     h = plt.imshow(display_array, vmin=-1, vmax=1, cmap=color)
