@@ -121,7 +121,7 @@ print('\nEvaluating sigmoid gradient...\n')
 
 g = f.sigmoidGradient(np.array([-1, -0.5, 0, 0.5, 1]))
 print('Sigmoid gradient evaluated at [-1 -0.5 0 0.5 1]:\n  ')
-print('{:2f} '.format(g))
+print(np.array_str(g, precision=2, suppress_small=True))
 print('\n\n')
 
 print('Program paused. Press enter to continue.\n')
@@ -136,11 +136,13 @@ input('Press enter to continue')
 
 print('\nInitializing Neural Network Parameters ...\n')
 
-initial_Theta1 = f.randInitializeWeights(input_layer_size, hidden_layer_size)
-initial_Theta2 = f.randInitializeWeights(hidden_layer_size, num_labels)
+epsilon_init = 0.12
+
+initial_Theta1 = f.randInitializeWeights(input_layer_size, hidden_layer_size, epsilon_init)
+initial_Theta2 = f.randInitializeWeights(hidden_layer_size, num_labels, epsilon_init)
 
 # Unroll parameters
-initial_nn_params = np.concatenate((initial_Theta1[:], initial_Theta2[:]), axis=1)
+initial_nn_params = np.concatenate((initial_Theta1.T.ravel(), initial_Theta2.T.ravel()))
 
 
 # =============== Part 7: Implement Backpropagation ===============
