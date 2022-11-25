@@ -186,6 +186,5 @@ def sigmoid(z):
 
 
 def sigmoidGradient(z):
-    g = 0
-    return g
+    return sigmoid(z) * (1 - sigmoid(z))
 
