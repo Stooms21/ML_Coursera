@@ -77,16 +77,15 @@ def nnCostFunction(nn_params,
     #               the regularization separately and then add them to Theta1_grad
     #               and Theta2_grad from Part 2.
     #
-
-
-
-
     # -------------------------------------------------------------
 
     # =========================================================================
 
     # Unroll gradients
+
     J = 1 / m * np.sum(-yr * np.log(h_theta) - (1 - yr) * np.log(1 - h_theta))
+    reg = lambda_t / (2 * m) * (np.sum(Theta1[:, 1::]**2) + np.sum(Theta2[:, 1::]**2))
+    J += reg
 
     return J
 
