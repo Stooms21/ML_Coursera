@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+from numpy import linalg as LA
 
 
 def nnCostFunction(nn_params,
@@ -8,7 +9,6 @@ def nnCostFunction(nn_params,
                    hidden_layer_size,
                    num_labels,
                    X, y, lambda_t):
-
     # NNCOSTFUNCTION Implements the neural network cost function for a two layer
     # neural network which performs classification
     #   [J grad] = NNCOSTFUNCTON(nn_params, hidden_layer_size, num_labels, ...
@@ -84,18 +84,49 @@ def nnCostFunction(nn_params,
     # Unroll gradients
 
     J = 1 / m * np.sum(-yr * np.log(h_theta) - (1 - yr) * np.log(1 - h_theta))
-    reg = lambda_t / (2 * m) * (np.sum(Theta1[:, 1::]**2) + np.sum(Theta2[:, 1::]**2))
+    reg = lambda_t / (2 * m) * (np.sum(Theta1[:, 1::] ** 2) + np.sum(Theta2[:, 1::] ** 2))
     J += reg
 
     return J
 
 
 def nnGradCostFunction(nn_params,
-                   input_layer_size,
-                   hidden_layer_size,
-                   num_labels,
-                   X, y, lambda_t):
-    grad = 0
+                       input_layer_size,
+                       hidden_layer_size,
+                       num_labels,
+                       X, y, lambda_t):
+    Theta1 = np.reshape(nn_params[0:hidden_layer_size * (input_layer_size + 1)],
+                        (hidden_layer_size, (input_layer_size + 1)), order='F')
+
+    Theta2 = np.reshape(nn_params[(hidden_layer_size * (input_layer_size + 1))::],
+                        (num_labels, (hidden_layer_size + 1)), order='F')
+
+    # Setup some useful variables
+    m = np.size(X, 0)
+
+    # recode the y labels to get vectors of 0 and 1
+    eye = np.eye(num_labels)
+    yr = eye[y - 1]
+
+    # Add the column of ones for bias unit
+    X = np.concatenate((np.ones((m, 1)), X), axis=1)
+
+    # Compute first hidden unit and adding the bias
+    z2 = sigmoid(X @ Theta1.T)
+    a2 = np.concatenate((np.ones((m, 1)), sigmoid(X @ Theta1.T)), axis=1)
+
+    # Compute h_theta
+    h_theta = sigmoid(a2 @ Theta2.T)
+
+    delta3 = h_theta - yr
+    delta2 = delta3 @ Theta2 * sigmoidGradient(np.concatenate((np.ones((m, 1)), X @ Theta1.T), axis=1))
+    D1 = 1 / m * delta2[:, 1::].T @ X
+    D2 = 1 / m * delta3.T @ a2
+
+    D1[:, 1::] += lambda_t / m * Theta1[:, 1::]
+    D2[:, 1::] += lambda_t / m * Theta2[:, 1::]
+
+    grad = np.concatenate((D1.T.ravel(), D2.T.ravel()))
     return grad
 
 
@@ -109,16 +140,106 @@ def randInitializeWeights(L_in, L_out, epsilon):
 
 
 def checkNNGradients(lambda_t=0):
-    return 0
+    # CHECKNNGRADIENTS Creates a small neural network to check the
+    # backpropagation gradients
+    #   CHECKNNGRADIENTS(lambda) Creates a small neural network to check the
+    #   backpropagation gradients, it will output the analytical gradients
+    #   produced by your backprop code and the numerical gradients (computed
+    #   using computeNumericalGradient). These two gradient computations should
+    #   result in very similar values.
+    #
+
+    input_layer_size = 3
+    hidden_layer_size = 5
+    num_labels = 3
+    m = 5
+
+    # We generate some 'random' test data
+    Theta1 = debugInitializeWeights(hidden_layer_size, input_layer_size)
+    Theta2 = debugInitializeWeights(num_labels, hidden_layer_size)
+    # Reusing debugInitializeWeights to generate X
+    X = debugInitializeWeights(m, input_layer_size - 1)
+    y = 1 + np.arange(1, m + 1) % num_labels
+
+    # Unroll parameters
+    nn_params = np.concatenate((Theta1.T.ravel(), Theta2.T.ravel()))
+
+    # Short hand for cost function
+    cost = nnCostFunction(nn_params, input_layer_size, hidden_layer_size,
+                          num_labels, X, y, lambda_t)
+    grad = nnGradCostFunction(nn_params, input_layer_size, hidden_layer_size,
+                              num_labels, X, y, lambda_t)
+
+    costFunc = lambda p: nnCostFunction(p, input_layer_size, hidden_layer_size,
+                                        num_labels, X, y, lambda_t)
+
+    numgrad = computeNumericalGradient(costFunc, nn_params)
+
+    # Visually examine the two gradient computations.  The two columns
+    # you get should be very similar. 
+    print('Numerical grad = ', numgrad)
+    print('Real grad = ', grad)
+    print('The above two columns you get should be very similar.\n'
+          '(Left-Your Numerical Gradient, Right-Analytical Gradient)\n\n')
+
+    # Evaluate the norm of the difference between two solutions.  
+    # If you have a correct implementation, and assuming you used EPSILON = 0.0001 
+    # in computeNumericalGradient.m, then diff below should be less than 1e-9
+    diff = LA.norm(numgrad - grad) / LA.norm(numgrad + grad)
+
+    print('If your backpropagation implementation is correct, then \n'
+          'the relative difference will be small (less than 1e-9). \n'
+          '\nRelative Difference: {:11f}\n'.format(diff))
 
 
 def computeNumericalGradient(J, theta):
-    numgrad = 0
+    # COMPUTENUMERICALGRADIENT Computes the gradient using "finite differences"
+    # and gives us a numerical estimate of the gradient.
+    #   numgrad = COMPUTENUMERICALGRADIENT(J, theta) computes the numerical
+    #   gradient of the function J around theta. Calling y = J(theta) should
+    #   return the function value at theta.
+
+    # Notes: The following code implements numerical gradient checking, and
+    #        returns the numerical gradient.It sets numgrad(i) to (a numerical
+    #        approximation of) the partial derivative of J with respect to the
+    #        i-th input argument, evaluated at theta. (i.e., numgrad(i) should
+    #        be the (approximately) the partial derivative of J with respect
+    #        to theta(i).)
+
+    numgrad = np.zeros(theta.shape)
+    perturb = np.zeros(theta.shape)
+    e = 1e-4
+    for p in range(np.size(theta)):
+        # Set perturbation vector
+        perturb[p] = e
+        loss1 = J(theta - perturb)
+        loss2 = J(theta + perturb)
+        # Compute Numerical Gradient
+        numgrad[p] = (loss2 - loss1) / (2 * e)
+        perturb[p] = 0
     return numgrad
 
 
 def debugInitializeWeights(fan_out, fan_in):
-    W = 0
+    # DEBUGINITIALIZEWEIGHTS Initialize the weights of a layer with fan_in
+    # incoming connections and fan_out outgoing connections using a fixed
+    # strategy, this will help you later in debugging
+    #   W = DEBUGINITIALIZEWEIGHTS(fan_in, fan_out) initializes the weights
+    #   of a layer with fan_in incoming connections and fan_out outgoing
+    #   connections using a fix set of values
+    #
+    #   Note that W should be set to a matrix of size(1 + fan_in, fan_out) as
+    #   the first row of W handles the "bias" terms
+    #
+
+# Set W to zeros
+    W = np.zeros((fan_out, 1 + fan_in))
+
+    # Initialize W using "sin", this ensures that W is always of the same
+    # values and will be useful for debugging
+    W = np.reshape(np.sin(np.arange(1, np.size(W) + 1)), W.shape, order='F') / 10
+
+    # =========================================================================
     return W
 
 
@@ -186,4 +307,3 @@ def sigmoid(z):
 
 def sigmoidGradient(z):
     return sigmoid(z) * (1 - sigmoid(z))
-
