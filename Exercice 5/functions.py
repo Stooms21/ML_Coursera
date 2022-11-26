@@ -97,7 +97,9 @@ def linearRegCostFunction(X, y, theta, lambda_t):
     m = len(y)  # number of training examples
 
     # You need to return the following variables correctly
-    J = 0
+
+    h_theta = X @ theta
+    J = 1 / (2 * m) * sum((h_theta - y)**2) + lambda_t / (2 * m) * sum(theta[1::]**2)
 
     # ====================== YOUR CODE HERE ======================
     # Instructions: Compute the cost and gradient of regularized linear
