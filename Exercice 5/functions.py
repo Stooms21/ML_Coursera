@@ -10,10 +10,10 @@ def featureNormalize(X):
     #   is 1. This is often a good preprocessing step to do when
     #   working with learning algorithms.
     
-    mu = np.mean(X)
+    mu = np.mean(X, axis=0)
     X_norm = X - mu
     
-    sigma = np.std(X_norm)
+    sigma = np.std(X_norm, axis=0)
     X_norm /= sigma
 
     return X_norm, mu, sigma
@@ -140,7 +140,7 @@ def plotFit(min_x, max_x, mu, sigma, theta, p):
 
     # We plot a range slightly bigger than the min and max values to get
     # an idea of how the fit will vary outside the range of the data points
-    x = (min_x - np.arange(15, max_x + 25, 0.05).T)
+    x = np.arange(min_x - 15, max_x + 25, 0.05)
 
     # Map the X values
     X_poly = polyFeatures(x, p)
@@ -169,6 +169,8 @@ def polyFeatures(X, p):
     #
     #
     # =========================================================================
+
+    X_poly = np.array([X**i for i in range(1, p+1)]).T.reshape((np.size(X), p), order='F')
 
     return X_poly
 
@@ -209,7 +211,7 @@ def validationCurve(X, y, Xval, yval):
     #
 
     # Selected values of lambda (you should not change this)
-    lambda_vec = np.array([0, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10]).T
+    lambda_vec = np.array([0, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10])
 
     # You need to return these variables correctly.
     error_train = np.zeros((len(lambda_vec), 1))
@@ -238,6 +240,12 @@ def validationCurve(X, y, Xval, yval):
     #
     #
     # =========================================================================
+
+    for i in range(len(lambda_vec)):
+        lambda_t = lambda_vec[i]
+        theta, cost = trainLinearReg(X, y, lambda_t)
+        error_train[i] = linearRegCostFunction(X, y, theta, 0)
+        error_val[i] = linearRegCostFunction(Xval, yval, theta, 0)
 
     return lambda_vec, error_train, error_val
     

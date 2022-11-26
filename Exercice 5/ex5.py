@@ -129,8 +129,8 @@ plt.ylim([0, 150])
 plt.show()
 
 print('# Training Examples\tTrain Error\tCross Validation Error\n')
-# for i in range(m):
-#     print('\t{:d}\t\t{:2f}\t{:2f}\n'.format(i, error_train[i], error_val[i]))
+for i in range(m):
+    print('\t{:d}\t\t{:2f}\t{:2f}\n'.format(i, error_train[i], error_val[i]))
 
 print('Program paused. Press enter to continue.\n')
 input('Press enter to continue')
