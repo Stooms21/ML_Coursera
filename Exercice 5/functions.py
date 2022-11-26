@@ -117,15 +117,19 @@ def linearRegGradCostFunction(X, y, theta, lambda_t):
     m = len(y)
     grad = np.zeros(theta.shape)
 
-    grad = grad.T.ravel()
+    h_theta = X @ theta
+
+    grad[0] = 1 / m * (h_theta - y).T @ X[:, 0]
+    grad[1::] = 1 / m * (h_theta - y).T @ X[:, 1::] + lambda_t / m * theta[1::]
+
     return grad
 
 
 def plotFit(min_x, max_x, mu, sigma, theta, p):
     # PLOTFIT Plots a learned polynomial regression fit over an existing figure.
     # Also works with linear regression.
-    #   PLOTFIT(min_x, max_x, mu, sigma, theta, p) plots the learned polynomial
-    #   fit with power p and feature normalization (mu, sigma).
+    # PLOTFIT(min_x, max_x, mu, sigma, theta, p) plots the learned polynomial
+    # fit with power p and feature normalization (mu, sigma).
 
     # Hold on to the current figure
 
