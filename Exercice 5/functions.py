@@ -34,12 +34,17 @@ def learningCurve(X, y, Xval, yval, lambda_t):
     #   datasets, you might want to do this in larger intervals.
     #
 
-# Number of training examples
+    # Number of training examples
     m = np.size(X, 0)
 
     # You need to return these values correctly
-    error_train = np.zeros((m, 1))
-    error_val = np.zeros((m, 1))
+    error_train = np.zeros(m)
+    error_val = np.zeros(m)
+
+    for i in range(m):
+        theta, cost = trainLinearReg(X[:i+1, :], y[:i+1], lambda_t)
+        error_train[i] = cost - lambda_t / (2 * i+1) * sum(theta[1::]**2)
+        error_val[i] = linearRegCostFunction(Xval, yval, theta, 0)
 
     # ====================== YOUR CODE HERE ======================
     # Instructions: Fill in this function to return training errors in
@@ -188,8 +193,9 @@ def trainLinearReg(X, y, lambda_t):
             maxiter=200,
             full_output=True)
     theta = output[0]
+    cost = output[1]
 
-    return theta
+    return theta, cost
 
 
 def validationCurve(X, y, Xval, yval):

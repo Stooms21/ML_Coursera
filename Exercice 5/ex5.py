@@ -94,7 +94,7 @@ input('Press enter to continue')
 
 #  Train linear regression with lambda = 0
 lambda_t = 0
-theta = f.trainLinearReg(Xc, y, lambda_t)
+theta, cost = f.trainLinearReg(Xc, y, lambda_t)
 
 #  Plot fit over the data
 plt.plot(X, y, 'rx', ms=10, lw=1.5)
@@ -175,7 +175,7 @@ input('Press enter to continue')
 #
 
 lambda_t = 0
-theta = f.trainLinearReg(X_poly, y, lambda_t)
+theta, cost = f.trainLinearReg(X_poly, y, lambda_t)
 
 # Plot training data and fit
 # figure(1)
