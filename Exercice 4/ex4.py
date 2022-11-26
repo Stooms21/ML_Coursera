@@ -5,7 +5,7 @@
 # 
 #  This file contains code that helps you get started on the
 #  linear exercise. You will need to complete the following functions 
-#  in this exericse:
+#  in this exercise:
 #
 #     sigmoidGradient.m
 #     randInitializeWeights.m
@@ -19,6 +19,7 @@
 import numpy as np
 from scipy.io import loadmat
 import functions as f
+from scipy.optimize import fmin_cg
 
 
 # Setup the parameters you will use for this exercise
@@ -129,7 +130,7 @@ input('Press enter to continue')
 
 
 # ================ Part 6: Initializing Pameters ================
-#  In this part of the exercise, you will be starting to implment a two
+#  In this part of the exercise, you will be starting to implement a two
 #  layer neural network that classifies digits. You will start by
 #  implementing a function to initialize the weights of the neural network
 #  (randInitializeWeights.m)
@@ -197,20 +198,23 @@ print('\nTraining Neural Network... \n')
 lambda_t = 1
 
 # Create "short hand" for the cost function to be minimized
-# costFunction = @(p) nnCostFunction(p, ...
-#                                    input_layer_size, ...
-#                                    hidden_layer_size, ...
-#                                    num_labels, X, y, lambda_t)
-#
+costFunc = lambda theta: f.nnCostFunction(theta, input_layer_size,
+                          hidden_layer_size, num_labels, X, y, lambda_t)
+gradFunc = lambda theta: f.nnGradCostFunction(theta, input_layer_size,
+                          hidden_layer_size, num_labels, X, y, lambda_t)
 # # Now, costFunction is a function that takes in only one argument (the
 # # neural network parameters)
-# [nn_params, cost] = fmincg(costFunction, initial_nn_params, options)
+
+output = fmin_cg(costFunc, initial_nn_params, gradFunc,
+        maxiter=50,
+        full_output=True)
+nn_params = output[0]
 
 # Obtain Theta1 and Theta2 back from nn_params
-Theta1 = np.reshape(nn_params[1:hidden_layer_size * (input_layer_size + 1)],
+Theta1 = np.reshape(nn_params[0:hidden_layer_size * (input_layer_size + 1)],
                     (hidden_layer_size, (input_layer_size + 1)), order='F')
 
-Theta2 = np.reshape(nn_params[(1 + (hidden_layer_size * (input_layer_size + 1)))::],
+Theta2 = np.reshape(nn_params[(hidden_layer_size * (input_layer_size + 1))::],
                     (num_labels, (hidden_layer_size + 1)), order='F')
 
 print('Program paused. Press enter to continue.\n')
@@ -224,7 +228,7 @@ input('Press enter to continue')
 
 print('\nVisualizing Neural Network... \n')
 
-f.displayData(Theta1[:, 2::])
+f.displayData(Theta1[:, 1::])
 
 print('\nProgram paused. Press enter to continue.\n')
 input('Press enter to continue')

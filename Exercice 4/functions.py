@@ -130,7 +130,21 @@ def nnGradCostFunction(nn_params,
 
 
 def predict(Theta1, Theta2, X):
-    p = 0
+    m = np.size(X, 0)
+    num_labels = np.size(Theta2, 0)
+
+    # You need to return the following variables correctly
+    p = np.zeros((np.size(X, 0), 1))
+
+    # Set bias unit
+    X = np.concatenate((np.ones((m, 1)), X), axis=1)
+
+    a2 = sigmoid(X @ Theta1.T)
+    a2 = np.concatenate((np.ones((m, 1)), a2), axis=1)
+
+    a3 = sigmoid(a2 @ Theta2.T)
+    p = np.argmax(a3, axis=1) + 1
+
     return p
 
 
