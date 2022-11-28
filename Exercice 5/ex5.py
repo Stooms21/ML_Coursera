@@ -228,5 +228,10 @@ print('lambda\t\tTrain Error\tValidation Error\n')
 #     print(' {:2f}\t{:2f}\t{:2f}\n'.format(lambda_vec[i], error_train[i], error_val[i]))
 
 
+lambda_t = lambda_vec[np.argmin(error_val)]
+theta, cost = f.trainLinearReg(X_poly, y, lambda_t)
+error_test = f.linearRegCostFunction(X_poly_test, ytest, theta, 0)
+
+
 print('Program paused. Press enter to continue.\n')
 input('Press enter to continue')
