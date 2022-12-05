@@ -70,7 +70,10 @@ def visualizeBoundary(X, y, model):
     vals = np.zeros(X1.shape)
     for i in range(np.size(X1, 1)):
         this_X = np.array([X1[:, i], X2[:, i]])
-        vals[:, i] = model.predict(this_X)
+        vals[:, i] = model.predict(this_X.T)
 
     # Plot the SVM boundary
-    plt.contour(X1, X2, vals, [0.5, 0.5], 'b')
+    plt.contour(X1, X2, vals, levels=[0.5, 0.50000001], colors='b')
+    plt.show()
+
+

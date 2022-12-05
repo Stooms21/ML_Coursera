@@ -106,13 +106,13 @@ print('\nTraining SVM with RBF Kernel (this may take 1 to 2 minutes) ...\n')
 
 # SVM Parameters
 C = 1
-sigma = 0.1
+sigma = 1. / (2. * 0.1**2)
 
 # We set the tolerance and max_passes lower here so that the code will run
 # faster. However, in practice, you will want to run the training to
 # convergence.
 # model= svmTrain(X, y, C, @(x1, x2) gaussianKernel(x1, x2, sigma))
-model = svm.SVC(C=C, kernel='rbf', tol=1e-3, max_iter=5)
+model = svm.SVC(C=C, kernel='rbf', gamma=sigma, tol=1e-3, max_iter=400)
 model.fit(X, y)
 
 f.visualizeBoundary(X, y, model)
@@ -130,6 +130,10 @@ print('Loading and Visualizing Data ...\n')
 # Load from ex6data3: 
 # You will have X, y in your environment
 data = loadmat('../Data/ex6data3.mat')
+X = data['X']
+y = data['y'].flatten()
+Xval = data['Xval']
+yval = data['yval'].flatten()
 
 # Plot training data
 f.plotData(X, y)
