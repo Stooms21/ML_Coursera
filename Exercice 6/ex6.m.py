@@ -53,8 +53,7 @@ print('\nTraining Linear SVM ...\n')
 # You should try to change the C value below and see how the decision
 # boundary varies (e.g., try C = 1000)
 C = 1
-# model = svmTrain(X, y, C, @linearKernel, 1e-3, 20)
-model = svm.SVC(C=C, kernel='linear', tol=1e-3, max_iter=20)
+model = svm.SVC(C=C, kernel='linear', tol=1e-3, max_iter=-1)
 model.fit(X, y)
 
 f.visualizeBoundaryLinear(X, y, model)
@@ -111,8 +110,7 @@ sigma = 1. / (2. * 0.1**2)
 # We set the tolerance and max_passes lower here so that the code will run
 # faster. However, in practice, you will want to run the training to
 # convergence.
-# model= svmTrain(X, y, C, @(x1, x2) gaussianKernel(x1, x2, sigma))
-model = svm.SVC(C=C, kernel='rbf', gamma=sigma, tol=1e-3, max_iter=400)
+model = svm.SVC(C=C, kernel='rbf', gamma=sigma, tol=1e-3, max_iter=-1)
 model.fit(X, y)
 
 f.visualizeBoundary(X, y, model)
@@ -148,11 +146,13 @@ input('Press enter to continue')
 #
 #
 # # Try different SVM Parameters here
-# [C, sigma] = dataset3Params(X, y, Xval, yval)
+C, sigma = f.dataset3Params(X, y, Xval, yval)
 #
 # # Train the SVM
 # model= svmTrain(X, y, C, @(x1, x2) gaussianKernel(x1, x2, sigma))
-# visualizeBoundary(X, y, model)
+model = svm.SVC(C=C, kernel='rbf', gamma=sigma, tol=1e-3, max_iter=-1)
+model.fit(X, y)
+f.visualizeBoundary(X, y, model)
 
 print('Program paused. Press enter to continue.\n')
 input('Press enter to continue')
