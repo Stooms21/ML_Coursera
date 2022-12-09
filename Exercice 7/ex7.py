@@ -113,7 +113,7 @@ input('Press enter to continue')
 print('\nRunning K-Means clustering on pixels from an image.\n\n')
 
 #  Load an image of a bird
-A = mpimg.imread('../Data/bird_small.png', format="png")
+A = mpimg.imread('../Data/touf.png', format="png")
 
 # If imread does not work for you, you can try instead
 #   load ('bird_small.mat');
@@ -129,50 +129,50 @@ X = np.reshape(A, (img_size[0] * img_size[1], 3), order='F')
 
 # Run your K-Means algorithm on this data
 # You should try different values of K and max_iters here
-K: int = 16
-max_iters: int = 10
-
-# When using K-Means, it is important the initialize the centroids
-# randomly.
-# You should complete the code in kMeansInitCentroids.m before proceeding
-initial_centroids = f.kMeansInitCentroids(X, K)
-
-# Run K-Means
-centroids, idx = f.runkMeans(X, initial_centroids, max_iters)
-
-print('Program paused. Press enter to continue.\n')
-input('Press enter to continue')
-
-
-# ================= Part 5: Image Compression ======================
-#  In this part of the exercise, you will use the clusters of K-Means to
-#  compress an image. To do this, we first find the closest clusters for
-#  each example. After that, we
-
-print('\nApplying K-Means to compress an image.\n\n')
-
-# Find closest cluster members
-idx = f.findClosestCentroids(X, centroids)
-
-# Essentially, now we have represented the image X as in terms of the
-# indices in idx.
-
-# We can now recover the image from the indices (idx) by mapping each pixel
-# (specified by its index in idx) to the centroid value
-X_recovered = centroids[idx, :]
-
-# Reshape the recovered image into proper dimensions
-X_recovered = np.reshape(X_recovered, (img_size[0], img_size[1], 3), order='F')
-
 # Display the original image
-plt.subplot(1, 2, 1)
+plt.subplot(2, 3, (1, 1))
 plt.imshow(A)
 plt.title('Original')
 
-# Display compressed image side by side
-plt.subplot(1, 2, 2)
-plt.imshow(X_recovered)
-plt.title(f'Compressed, with {K} colors.')
+for i in range(1, 6):
+    K: int = 2**i
+    max_iters: int = 10
+
+    # When using K-Means, it is important the initialize the centroids
+    # randomly.
+    # You should complete the code in kMeansInitCentroids.m before proceeding
+    initial_centroids = f.kMeansInitCentroids(X, K)
+
+    # Run K-Means
+    centroids, idx = f.runkMeans(X, initial_centroids, max_iters)
+
+    print('Program paused. Press enter to continue.\n')
+    input('Press enter to continue')
+
+    # ================= Part 5: Image Compression ======================
+    #  In this part of the exercise, you will use the clusters of K-Means to
+    #  compress an image. To do this, we first find the closest clusters for
+    #  each example. After that, we
+
+    print('\nApplying K-Means to compress an image.\n\n')
+
+    # Find closest cluster members
+    idx = f.findClosestCentroids(X, centroids)
+
+    # Essentially, now we have represented the image X as in terms of the
+    # indices in idx.
+
+    # We can now recover the image from the indices (idx) by mapping each pixel
+    # (specified by its index in idx) to the centroid value
+    X_recovered = centroids[idx, :]
+
+    # Reshape the recovered image into proper dimensions
+    X_recovered = np.reshape(X_recovered, (img_size[0], img_size[1], 3), order='F')
+
+    # Display compressed image side by side
+    plt.subplot(2, 3, (i // 3 + 1, i % 3 + 1))
+    plt.imshow(X_recovered)
+    plt.title(f'Compressed, with {K} colors.')
 plt.show()
 
 
